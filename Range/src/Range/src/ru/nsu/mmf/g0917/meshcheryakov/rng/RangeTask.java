@@ -31,20 +31,20 @@ public class RangeTask {
 
         Range[] unionRange = Range.getUnion(range1, range2);
         System.out.println("Объединение двух интервалов:");
-        for (int i = 0; i < unionRange.length; i++) {
-            if (unionRange[i] == null) {
+        for (Range i : unionRange) {
+            if (i == null) {
                 break;
             }
-            System.out.printf("от %.3f до %.3f%n", unionRange[i].getFrom(), unionRange[i].getTo());
+            System.out.printf("от %.3f до %.3f%n", i.getFrom(), i.getTo());
         }
 
         Range[] differenceRange = Range.getDifference(range1, range2);
         System.out.println("Разность первого интервала от второго:");
-        for (int i = 0; i < unionRange.length; i++) {
-            if (differenceRange[i] == null) {
+        for (Range i : unionRange) {
+            if (i == null) {
                 break;
             }
-            System.out.printf("от %.3f до %.3f%n", differenceRange[i].getFrom(), differenceRange[i].getTo());
+            System.out.printf("от %.3f до %.3f%n", i.getFrom(), i.getTo());
         }
     }
 }
