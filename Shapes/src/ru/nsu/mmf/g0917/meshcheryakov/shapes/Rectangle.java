@@ -48,4 +48,3 @@ public final class Rectangle implements Shapes {
         return width == rectangle.width && height == rectangle.height;
     }
 }
-

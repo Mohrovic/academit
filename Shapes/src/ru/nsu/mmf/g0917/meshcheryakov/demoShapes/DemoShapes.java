@@ -1,4 +1,6 @@
-package ru.nsu.mmf.g0917.meshcheryakov.shapes;
+package ru.nsu.mmf.g0917.meshcheryakov.demoShapes;
+
+import ru.nsu.mmf.g0917.meshcheryakov.shapes.*;
 
 import java.util.ArrayList;
 

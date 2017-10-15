@@ -9,5 +9,3 @@ public interface Shapes {
 
     double getPerimeter();
 }
-
-
