@@ -1,6 +1,6 @@
 package ru.nsu.mmf.g0917.meshcheryakov.shapes;
 
-public final class Triangle implements Shapes {
+public final class Triangle implements Shape {
     private double x1;
     private double y1;
     private double x2;

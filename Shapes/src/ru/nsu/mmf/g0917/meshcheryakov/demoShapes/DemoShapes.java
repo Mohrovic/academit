@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class DemoShapes {
 
-    public static int getIndexOfMaxArea(ArrayList<Shapes> shapes) {
+    public static int getIndexOfMaxArea(ArrayList<Shape> shapes) {
         double maxArea = 0;
         int maxIndex = -1;
         for (int i = 0; i < shapes.size(); i++) {
@@ -19,7 +19,7 @@ public class DemoShapes {
         return maxIndex;
     }
 
-    public static int getIndexOf2ndPerimeter(ArrayList<Shapes> shapes) {
+    public static int getIndexOf2ndPerimeter(ArrayList<Shape> shapes) {
         double maxPerimeter = 0;
         int maxIndex = -1;
         int secondIndex = -1;
@@ -35,7 +35,7 @@ public class DemoShapes {
     }
 
     public static void main(String[] args) {
-        ArrayList<Shapes> shapes = new ArrayList<>();
+        ArrayList<Shape> shapes = new ArrayList<>();
 
         shapes.add(new Square(4.95));
         shapes.add(new Triangle(3, -17.5, 23.8, 1, 8, 0.15));

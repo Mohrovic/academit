@@ -1,6 +1,6 @@
 package ru.nsu.mmf.g0917.meshcheryakov.shapes;
 
-public interface Shapes {
+public interface Shape {
     double getWidth();
 
     double getHeight();

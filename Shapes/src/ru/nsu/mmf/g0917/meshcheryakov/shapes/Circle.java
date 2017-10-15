@@ -1,6 +1,6 @@
 package ru.nsu.mmf.g0917.meshcheryakov.shapes;
 
-public final class Circle implements Shapes {
+public final class Circle implements Shape {
     private double radius;
 
     public Circle(double radius) {

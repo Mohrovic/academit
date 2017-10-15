@@ -1,6 +1,6 @@
 package ru.nsu.mmf.g0917.meshcheryakov.shapes;
 
-public final class Rectangle implements Shapes {
+public final class Rectangle implements Shape {
     private double width;
     private double height;
 

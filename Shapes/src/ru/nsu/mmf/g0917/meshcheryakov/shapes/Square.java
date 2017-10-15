@@ -1,6 +1,6 @@
 package ru.nsu.mmf.g0917.meshcheryakov.shapes;
 
-public final class Square implements Shapes {
+public final class Square implements Shape {
     private double width;
 
     public Square(double width) {
