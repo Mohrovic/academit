@@ -25,7 +25,7 @@ public final class Square implements Shape {
 
     @Override
     public String toString() {
-        return String.valueOf(width);
+        return "[ " + String.valueOf(width) + " ]";
     }
 
     @Override
@@ -38,8 +38,12 @@ public final class Square implements Shape {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this){
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()){
+            return false;
+        }
         Square square = (Square) obj;
         return width == square.width;
     }

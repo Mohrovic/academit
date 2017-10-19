@@ -3,36 +3,9 @@ package ru.nsu.mmf.g0917.meshcheryakov.demoShapes;
 import ru.nsu.mmf.g0917.meshcheryakov.shapes.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DemoShapes {
-
-    public static int getIndexOfMaxArea(ArrayList<Shape> shapes) {
-        double maxArea = 0;
-        int maxIndex = -1;
-        for (int i = 0; i < shapes.size(); i++) {
-            double area = shapes.get(i).getArea();
-            if (maxArea < area) {
-                maxArea = area;
-                maxIndex = i;
-            }
-        }
-        return maxIndex;
-    }
-
-    public static int getIndexOf2ndPerimeter(ArrayList<Shape> shapes) {
-        double maxPerimeter = 0;
-        int maxIndex = -1;
-        int secondIndex = -1;
-        for (int i = 0; i < shapes.size(); i++) {
-            double perimeter = shapes.get(i).getPerimeter();
-            if (maxPerimeter < perimeter) {
-                maxPerimeter = perimeter;
-                secondIndex = maxIndex;
-                maxIndex = i;
-            }
-        }
-        return secondIndex;
-    }
 
     public static void main(String[] args) {
         ArrayList<Shape> shapes = new ArrayList<>();
@@ -44,14 +17,19 @@ public class DemoShapes {
         shapes.add(new Rectangle(0.7, 19));
         shapes.add(new Rectangle(4, 12.4));
         shapes.add(new Circle(0.08));
-        shapes.add(new Circle(19));
+        shapes.add(new Circle(4));
 
-        int indexOfMaxArea = getIndexOfMaxArea(shapes);
-        System.out.printf("Фигура с максимальной площаью %.1f находится под индексом %d%n",
-                shapes.get(indexOfMaxArea).getArea(), indexOfMaxArea);
+        Shape[] shapesArray = new Shape[shapes.size()];
+        shapesArray = shapes.toArray(shapesArray);
 
-        int indexOf2ndPerimeter = getIndexOf2ndPerimeter(shapes);
-        System.out.printf("Фигура с периметром %.1f (второй по величине) находится под индексом %d%n",
-                shapes.get(indexOf2ndPerimeter).getPerimeter(), indexOf2ndPerimeter);
+        Arrays.sort(shapesArray, new SortByArea());
+
+        System.out.printf("Фигура с максимальной площадью (%.3f): %s%n",
+                shapesArray[0].getArea(), shapesArray[0].toString());
+
+        Arrays.sort(shapesArray, new SortByPerimeter());
+
+        System.out.printf("Фигура со вторым по величине периметром (%.3f): %s",
+                shapesArray[1].getPerimeter(), shapesArray[1].toString());
     }
 }

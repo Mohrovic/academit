@@ -28,7 +28,15 @@ public final class Rectangle implements Shape {
 
     @Override
     public String toString() {
-        return Double.toString(width) + ", " + Double.toString(height);
+        StringBuilder sbString = new StringBuilder();
+
+        sbString.append("[ ");
+        sbString.append(Double.toString(width));
+        sbString.append(", ");
+        sbString.append(Double.toString(height));
+        sbString.append(" ]");
+
+        return  sbString.toString();
     }
 
     @Override
@@ -42,8 +50,12 @@ public final class Rectangle implements Shape {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this){
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()){
+            return false;
+        }
         Rectangle rectangle = (Rectangle) obj;
         return width == rectangle.width && height == rectangle.height;
     }

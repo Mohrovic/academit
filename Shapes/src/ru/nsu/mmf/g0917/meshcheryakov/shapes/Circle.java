@@ -25,7 +25,7 @@ public final class Circle implements Shape {
 
     @Override
     public String toString() {
-        return String.valueOf(radius);
+        return "[ " + String.valueOf(radius) + " ]";
     }
 
     @Override
@@ -38,8 +38,12 @@ public final class Circle implements Shape {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()) {
+            return false;
+        }
         Circle circle = (Circle) obj;
         return radius == circle.radius;
     }

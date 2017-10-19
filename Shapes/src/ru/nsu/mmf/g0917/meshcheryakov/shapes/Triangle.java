@@ -69,7 +69,6 @@ public final class Triangle implements Shape {
         sbString.append(Double.toString(x3));
         sbString.append(", ");
         sbString.append(Double.toString(y3));
-        sbString.append(", ");
         sbString.append(" ]");
 
         return sbString.toString();
@@ -90,8 +89,12 @@ public final class Triangle implements Shape {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != this.getClass()) return false;
+        if (obj == this){
+            return true;
+        }
+        if (obj == null || obj.getClass() != this.getClass()){
+            return false;
+        }
         Triangle triangle = (Triangle) obj;
         return x1 == triangle.x1 && x2 == triangle.x2 && x3 == triangle.x3 &&
                 y1 == triangle.y1 && y2 == triangle.y2 && y3 == triangle.y3;
