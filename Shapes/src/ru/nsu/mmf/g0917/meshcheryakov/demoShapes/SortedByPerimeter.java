@@ -4,7 +4,7 @@ import ru.nsu.mmf.g0917.meshcheryakov.shapes.Shape;
 
 import java.util.Comparator;
 
-class SortByPerimeter implements Comparator<Shape> {
+class SortedByPerimeter implements Comparator<Shape> {
 
     @Override
     public int compare(Shape shapeA, Shape shapeB) {
