@@ -22,12 +22,12 @@ public class DemoShapes {
         Shape[] shapesArray = new Shape[shapes.size()];
         shapesArray = shapes.toArray(shapesArray);
 
-        Arrays.sort(shapesArray, new SortByArea());
+        Arrays.sort(shapesArray, new SortedByAreaComparator());
 
         System.out.printf("Фигура с максимальной площадью (%.3f): %s%n",
                 shapesArray[0].getArea(), shapesArray[0].toString());
 
-        Arrays.sort(shapesArray, new SortByPerimeter());
+        Arrays.sort(shapesArray, new SortedByPerimeterComparator());
 
         System.out.printf("Фигура со вторым по величине периметром (%.3f): %s",
                 shapesArray[1].getPerimeter(), shapesArray[1].toString());
