@@ -118,20 +118,14 @@ final class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean containsAll(Collection<?> elements) {
-        int elementsSize = elements.size();
+        Iterator iterator = elements.iterator();
 
-        if (this.length < elementsSize) {
-            return false;
-        }
-
-        //noinspection unchecked
-        T[] comparingElements = (T[]) elements.toArray();
-
-        for (int i = 0; i < elementsSize; i++) {
+        while (iterator.hasNext()) {
+            Object element = iterator.next();
             boolean contains = false;
 
-            for (int j = 0; j < this.length; j++) {
-                if (items[j].equals(comparingElements[i])) {
+            for (int i = 0; i < this.length; i++) {
+                if (items[i].equals(element)) {
                     contains = true;
                 }
             }
@@ -194,11 +188,7 @@ final class MyArrayList<T> implements List<T> {
 
             @Override
             public boolean hasNext() {
-                if (index < length - 1) {
-                    ++index;
-                    return true;
-                }
-                return false;
+                return index < length - 1;
             }
 
             @Override
@@ -245,11 +235,7 @@ final class MyArrayList<T> implements List<T> {
 
             @Override
             public boolean hasNext() {
-                if (currentIndex < length - 1) {
-                    ++currentIndex;
-                    return true;
-                }
-                return false;
+                return currentIndex < length - 1;
             }
 
             @Override
@@ -263,11 +249,7 @@ final class MyArrayList<T> implements List<T> {
 
             @Override
             public boolean hasPrevious() {
-                if (currentIndex > 0) {
-                    --currentIndex;
-                    return true;
-                }
-                return false;
+                return currentIndex > 0;
             }
 
             @Override
@@ -344,25 +326,20 @@ final class MyArrayList<T> implements List<T> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        if (c == null || c.getClass() != type) {
+        if (c == null) {
             return false;
         }
 
-        //noinspection unchecked
-        T[] removingArray = (T[]) c.toArray();
+        boolean removed = false;
 
-        boolean contains = false;
-
-        for (int i = 0; i < length; i++) {
-            for (T e : removingArray) {
-                if (items[i].equals(e)) {
-                    System.arraycopy(this.items, i + 1, this.items, i, length - i - 1);
-                    length--;
-                    contains = true;
-                }
+        for (int i = 0; i < this.length; i++) {
+            if (c.contains(items[i])) {
+                this.remove(i);
+                i--;
+                removed = true;
             }
         }
-        return contains;
+        return removed;
     }
 
     @Override

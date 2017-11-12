@@ -65,12 +65,18 @@ public class DemoArray {
 
         System.out.println(Arrays.toString(names.toArray()));
         String ghi = "g-h-i";
-        System.out.printf("Элемент %s находится под индексом %d%n", ghi, names.lastIndexOf(ghi));
+        System.out.printf("Элемент %s находится под индексом %d%n%n", ghi, names.lastIndexOf(ghi));
 
-        //проверка containsAll
+        System.out.println("Проверка containsAll");
         names3.add("новый элемент");
-        System.out.println(Arrays.toString(names.toArray()));
-        System.out.println(Arrays.toString(names3.toArray()));
-        System.out.println(names.containsAll(names3));
+        System.out.printf("names:  %s%n", Arrays.toString(names.toArray()));
+        System.out.printf("names3: %s%n", Arrays.toString(names3.toArray()));
+        System.out.printf("names содержит все элементы names3: %s%n%n", names.containsAll(names3));
+
+        System.out.println("Проверка removeAll");
+        System.out.printf("names:  %s%n", Arrays.toString(names.toArray()));
+        System.out.printf("names3: %s%n", Arrays.toString(names3.toArray()));
+        names.removeAll(names3);
+        System.out.printf("names:  %s%n", Arrays.toString(names.toArray()));
     }
 }
