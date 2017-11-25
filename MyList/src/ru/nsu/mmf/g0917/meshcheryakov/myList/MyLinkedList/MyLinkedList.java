@@ -4,9 +4,31 @@ public class MyLinkedList<T> {
     private MyLinkedListItem<T> head;
     private int length;
 
+    public MyLinkedList() {
+        length = 0;
+    }
+
     public MyLinkedList(T data) {
-        this.head = new MyLinkedListItem<>(data, null);
+        head = new MyLinkedListItem<>(data, null);
         length = 1;
+    }
+
+    public T set(T data, int index) {
+        if (index < 0 || index >= length) {
+            throw new IndexOutOfBoundsException("Заданный индекс находится вне диапазона списка");
+        }
+
+        MyLinkedListItem<T> current = head;
+
+        for (int i = 0; i < index; i++) {
+            current = current.getNext();
+        }
+
+        return current.setData(data);
+    }
+
+    public void setLength(int length) {
+        this.length = length;
     }
 
     public int getSize() {
@@ -33,23 +55,6 @@ public class MyLinkedList<T> {
         return getItem(index).getData();
     }
 
-    public T set(T data, int index) {
-        if (index < 0 || index >= length) {
-            throw new IndexOutOfBoundsException("Заданный индекс находится вне диапазона списка");
-        }
-
-        MyLinkedListItem<T> current = head;
-
-        for (int i = 0; i < index; i++) {
-            current = current.getNext();
-        }
-
-        T previousData = current.getData();
-        current.setData(data);
-
-        return previousData;
-    }
-
     public T remove(int index) {
         if (index < 0 || index >= length) {
             throw new IndexOutOfBoundsException("Заданный индекс находится вне диапазона списка");
@@ -63,13 +68,10 @@ public class MyLinkedList<T> {
             return current.getData();
         }
 
-        for (int i = 1; i < index; i++) {
-            current = current.getNext();
-        }
+        current = getItem(index - 1);
 
         T removedData = current.getNext().getData();
         current.setNext(current.getNext().getNext());
-
 
         return removedData;
     }
@@ -79,39 +81,40 @@ public class MyLinkedList<T> {
         length++;
     }
 
-    public void remove(T data) {
+    public boolean remove(T data) {
         MyLinkedListItem<T> current = head;
+        boolean deleted = false;
+
         for (int i = 0; i < length; i++) {
-            if (current.getData().equals(data)) {
+            if (data == current.getData() || current.getData().equals(data)) {
                 remove(i);
+                deleted = true;
+                break;
             }
             current = current.getNext();
         }
+        return deleted;
     }
 
     public T removeHead() {
-        T current = head.getData();
-
-        remove(0);
-
-        return current;
+         return remove(0);
     }
 
-    public void insert(T data, int index) {
+    public void insertAfter(T data, int index) {
         if (index < 0 || index >= length) {
             throw new IndexOutOfBoundsException("Заданный индекс находится вне диапазона списка");
         }
 
-        MyLinkedListItem<T> current = head;
-        for (int i = 1; i <= index; i++) {
-            current = current.getNext();
-        }
+        MyLinkedListItem<T> current = getItem(index);
+
         MyLinkedListItem<T> next = current.getNext();
+
         current.setNext(new MyLinkedListItem<>(data, next));
+
         length++;
     }
 
-    public MyLinkedListItem<T> insertTo(T data, int index) {
+    public MyLinkedListItem<T> insert(T data, int index) {
         if (index < 0 || index > length) {
             throw new IndexOutOfBoundsException("Заданный индекс находится вне диапазона списка");
         }
@@ -126,9 +129,7 @@ public class MyLinkedList<T> {
             return current;
         }
 
-        for (int i = 1; i < index; i++) {
-            current = current.getNext();
-        }
+        current = getItem(index - 1);
 
         MyLinkedListItem<T> next = current.getNext();
 
@@ -162,16 +163,25 @@ public class MyLinkedList<T> {
 
     public MyLinkedList<T> copy() {
         MyLinkedList<T> listCopy = new MyLinkedList<>(head.getData());
+        MyLinkedListItem<T> currentCopy = listCopy.getHead();
+
         MyLinkedListItem<T> current = head;
+
         for (int i = 1; i < length; i++) {
+            currentCopy.setData(current.getData());
+
             current = current.getNext();
-            listCopy.add(current.getData());
+
+            currentCopy.setNext(current);
+            currentCopy = currentCopy.getNext();
         }
+
+        listCopy.setLength(length);
         return listCopy;
     }
 
     public void add(T data) {
-        insertTo(data, length);
+        insert(data, length);
     }
 
     public T[] toArray() {
