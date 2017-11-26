@@ -1,5 +1,7 @@
 package ru.nsu.mmf.g0917.meshcheryakov.myList.MyLinkedList;
 
+import java.util.Objects;
+
 public class MyLinkedList<T> {
     private MyLinkedListItem<T> head;
     private int length;
@@ -11,20 +13,6 @@ public class MyLinkedList<T> {
     public MyLinkedList(T data) {
         head = new MyLinkedListItem<>(data, null);
         length = 1;
-    }
-
-    public T set(T data, int index) {
-        if (index < 0 || index >= length) {
-            throw new IndexOutOfBoundsException("Заданный индекс находится вне диапазона списка");
-        }
-
-        MyLinkedListItem<T> current = head;
-
-        for (int i = 0; i < index; i++) {
-            current = current.getNext();
-        }
-
-        return current.setData(data);
     }
 
     public void setLength(int length) {
@@ -55,6 +43,16 @@ public class MyLinkedList<T> {
         return getItem(index).getData();
     }
 
+    public T set(int index, T data) {
+        if (index < 0 || index >= length) {
+            throw new IndexOutOfBoundsException("Заданный индекс находится вне диапазона списка");
+        }
+
+        MyLinkedListItem<T> current = getItem(index);
+
+        return current.setData(data);
+    }
+
     public T remove(int index) {
         if (index < 0 || index >= length) {
             throw new IndexOutOfBoundsException("Заданный индекс находится вне диапазона списка");
@@ -83,35 +81,19 @@ public class MyLinkedList<T> {
 
     public boolean remove(T data) {
         MyLinkedListItem<T> current = head;
-        boolean deleted = false;
 
         for (int i = 0; i < length; i++) {
-            if (data == current.getData() || current.getData().equals(data)) {
+            if (Objects.equals(data, current.getData())) {
                 remove(i);
-                deleted = true;
-                break;
+                return true;
             }
             current = current.getNext();
         }
-        return deleted;
+        return false;
     }
 
     public T removeHead() {
-         return remove(0);
-    }
-
-    public void insertAfter(T data, int index) {
-        if (index < 0 || index >= length) {
-            throw new IndexOutOfBoundsException("Заданный индекс находится вне диапазона списка");
-        }
-
-        MyLinkedListItem<T> current = getItem(index);
-
-        MyLinkedListItem<T> next = current.getNext();
-
-        current.setNext(new MyLinkedListItem<>(data, next));
-
-        length++;
+        return remove(0);
     }
 
     public MyLinkedListItem<T> insert(T data, int index) {
@@ -162,6 +144,10 @@ public class MyLinkedList<T> {
     }
 
     public MyLinkedList<T> copy() {
+        if (head == null) {
+            return new MyLinkedList<>();
+        }
+
         MyLinkedList<T> listCopy = new MyLinkedList<>(head.getData());
         MyLinkedListItem<T> currentCopy = listCopy.getHead();
 
@@ -172,7 +158,7 @@ public class MyLinkedList<T> {
 
             current = current.getNext();
 
-            currentCopy.setNext(current);
+            currentCopy.setNext(new MyLinkedListItem<>(current.getData(), null));
             currentCopy = currentCopy.getNext();
         }
 
