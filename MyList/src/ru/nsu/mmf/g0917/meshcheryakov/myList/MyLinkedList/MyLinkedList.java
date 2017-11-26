@@ -15,7 +15,8 @@ public class MyLinkedList<T> {
         length = 1;
     }
 
-    public void setLength(int length) {
+    public MyLinkedList(T data, int length) {
+        head = new MyLinkedListItem<>(data, null);
         this.length = length;
     }
 
@@ -122,7 +123,7 @@ public class MyLinkedList<T> {
     }
 
     public void invert() {
-        if (length == 1) {
+        if (length == 0 || length == 1) {
             return;
         }
 
@@ -148,21 +149,18 @@ public class MyLinkedList<T> {
             return new MyLinkedList<>();
         }
 
-        MyLinkedList<T> listCopy = new MyLinkedList<>(head.getData());
+        MyLinkedList<T> listCopy = new MyLinkedList<>(head.getData(), length);
         MyLinkedListItem<T> currentCopy = listCopy.getHead();
 
         MyLinkedListItem<T> current = head;
 
         for (int i = 1; i < length; i++) {
-            currentCopy.setData(current.getData());
-
             current = current.getNext();
 
             currentCopy.setNext(new MyLinkedListItem<>(current.getData(), null));
             currentCopy = currentCopy.getNext();
         }
 
-        listCopy.setLength(length);
         return listCopy;
     }
 

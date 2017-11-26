@@ -1,7 +1,6 @@
 package ru.nsu.mmf.g0917.meshcheryakov.myList.MyLinkedListDemo;
 
 import ru.nsu.mmf.g0917.meshcheryakov.myList.MyLinkedList.MyLinkedList;
-import ru.nsu.mmf.g0917.meshcheryakov.myList.MyLinkedList.MyLinkedListItem;
 
 import java.util.Arrays;
 
@@ -15,19 +14,23 @@ public class MyLinkedListDemo {
         myList.add("d");
         System.out.println(Arrays.toString(myList.toArray()));
 
-        myList.insertTo("e", 0);
+        int index = 4;
+        String e = "e";
+        System.out.printf("%nПроверка insert \"%s\" на место с индексом %d:%n", e, index);
+        myList.insert(e, index);
+        System.out.println(Arrays.toString(myList.toArray()));
 
         System.out.printf("%nДлина списка составляет: %s элемнтов", myList.getSize());
 
-        int index = 0;
+        index = 0;
         System.out.printf("%n%nПроверка getItem по индексу %d: %s", index, myList.getItem(index).getData());
         System.out.printf("%n%nПроверка get по индексу %d: %s", index, myList.get(index));
 
         index = 4;
-        System.out.printf("%n%nПроверка set по индексу %d. Старое значение: %s%n", index, myList.set("f", index));
+        System.out.printf("%n%nПроверка set по индексу %d. Старое значение: %s%n", index, myList.set(index, "f"));
         System.out.println(Arrays.toString(myList.toArray()));
 
-        index = 3;
+        index = 4;
         System.out.printf("%nПроверка remove по индексу %d. Удаленное значение: %s%n", index, myList.remove(index));
         System.out.println(Arrays.toString(myList.toArray()));
 
@@ -36,17 +39,15 @@ public class MyLinkedListDemo {
         myList.insert(g);
         System.out.println(Arrays.toString(myList.toArray()));
 
-        String e = "e";
-        System.out.printf("%nПроверка remove первого встретившегося элемента, сответствующего данным \"%s\":%n", e);
-        myList.remove(e);
+        String find = "d";
+        myList.set(3, null);
+        System.out.printf("%nПроверка remove первого встретившегося элемента, " +
+                "сответствующего данным \"%s\":%n", find);
+        System.out.println(Arrays.toString(myList.toArray()));
+        System.out.printf("Удалено: %s%n", myList.remove(find));
         System.out.println(Arrays.toString(myList.toArray()));
 
-        System.out.printf("%nПроверка remove первого элемента (%s):", myList.removeHead());
-        System.out.println(Arrays.toString(myList.toArray()));
-
-        index = 1;
-        System.out.printf("%nПроверка insert после элемента с индексом %d:%n", index);
-        myList.insert("h", index);
+        System.out.printf("%nПроверка remove первого элемента (%s):%n", myList.removeHead());
         System.out.println(Arrays.toString(myList.toArray()));
 
         System.out.println("\nПроверка invert:");
@@ -63,5 +64,10 @@ public class MyLinkedListDemo {
 
         System.out.println("\nПроверка copy:");
         System.out.println(Arrays.toString(myList2.copy().toArray()));
+
+        System.out.println("\nПроверка copy пустого списка:");
+        MyLinkedList<String> emptyList = new MyLinkedList<>();
+        System.out.println(Arrays.toString(emptyList.toArray()));
+        System.out.println(Arrays.toString(emptyList.copy().toArray()));
     }
 }
