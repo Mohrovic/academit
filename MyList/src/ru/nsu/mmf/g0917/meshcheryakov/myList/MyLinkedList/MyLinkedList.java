@@ -15,11 +15,6 @@ public class MyLinkedList<T> {
         length = 1;
     }
 
-    public MyLinkedList(T data, int length) {
-        head = new MyLinkedListItem<>(data, null);
-        this.length = length;
-    }
-
     public int getSize() {
         return length;
     }
@@ -149,7 +144,7 @@ public class MyLinkedList<T> {
             return new MyLinkedList<>();
         }
 
-        MyLinkedList<T> listCopy = new MyLinkedList<>(head.getData(), length);
+        MyLinkedList<T> listCopy = new MyLinkedList<>(head.getData());
         MyLinkedListItem<T> currentCopy = listCopy.getHead();
 
         MyLinkedListItem<T> current = head;
@@ -160,7 +155,7 @@ public class MyLinkedList<T> {
             currentCopy.setNext(new MyLinkedListItem<>(current.getData(), null));
             currentCopy = currentCopy.getNext();
         }
-
+        listCopy.length = this.length;
         return listCopy;
     }
 
