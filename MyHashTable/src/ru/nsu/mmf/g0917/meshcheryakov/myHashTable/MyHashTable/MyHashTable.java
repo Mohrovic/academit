@@ -4,40 +4,43 @@ import java.util.*;
 
 public class MyHashTable<T> implements Collection<T> {
     private ArrayList<T>[] table;
-    private int length = 100;
+    private int size = 0;
+    private int modificationCount = 0;
 
     public MyHashTable() {
+        int length = 100;
         //noinspection unchecked
         table = (ArrayList<T>[]) new ArrayList[length];
     }
 
-    public MyHashTable(T item) {
+    public MyHashTable(int length) {
+        if (length <= 0) {
+            throw new IllegalArgumentException("Размер массива не может быть меньше 1");
+        }
+
         //noinspection unchecked
         table = (ArrayList<T>[]) new ArrayList[length];
-        int itemHashCode = Math.abs(item.hashCode() % length);
-        table[itemHashCode] = new ArrayList<>();
-        table[itemHashCode].add(item);
     }
 
     @Override
     public int size() {
-        int size = 0;
-
-        for (ArrayList<T> e : table) {
-            size += e.size();
-        }
-
         return size;
     }
 
     @Override
     public boolean isEmpty() {
-        return (size() == 0);
+        return (size == 0);
     }
 
     @Override
     public boolean contains(Object o) {
-        int index = Math.abs(o.hashCode() % length);
+        int oHash = 0;
+
+        if (o != null) {
+            oHash = o.hashCode();
+        }
+
+        int index = Math.abs(oHash % table.length);
 
         return table[index] != null && table[index].contains(o);
     }
@@ -48,12 +51,13 @@ public class MyHashTable<T> implements Collection<T> {
         return new Iterator<T>() {
             private int index = 0;
             private int position = -1;
+            private final int CURRENT_MODIFICATION_COUNT = modificationCount;
 
             @Override
             public boolean hasNext() {
                 int oldIndex = index;
                 int oldPosition = position;
-                while (index < length) {
+                while (index < table.length) {
                     if (table[index] == null) {
                         index++;
                         continue;
@@ -74,7 +78,12 @@ public class MyHashTable<T> implements Collection<T> {
 
             @Override
             public T next() {
-                while (index < length) {
+                if (modificationCount > CURRENT_MODIFICATION_COUNT) {
+                    throw new ConcurrentModificationException(
+                            "Во время работы итератора произошло изменение коллекции");
+                }
+
+                while (index < table.length) {
                     if (table[index] == null) {
                         index++;
                         continue;
@@ -97,21 +106,15 @@ public class MyHashTable<T> implements Collection<T> {
     @Override
     public Object[] toArray() {
         //noinspection unchecked
-        T[] array = (T[]) new Object[length];
-        int arrayLength = 0;
-        for (ArrayList<T> e : table) {
-            if (e != null) {
+        T[] array = (T[]) new Object[size];
 
-                //noinspection unchecked
-                T[] eArray = (T[]) e.toArray();
-                int eArrayLength = eArray.length;
-
-                System.arraycopy(eArray, 0, array, arrayLength, eArrayLength);
-
-                arrayLength += eArrayLength;
-            }
+        int i = 0;
+        for (T element : this) {
+            array[i] = element;
+            i++;
         }
-        return Arrays.copyOf(array, arrayLength);
+
+        return array;
     }
 
     @Override
@@ -120,6 +123,7 @@ public class MyHashTable<T> implements Collection<T> {
             throw new NullPointerException("Массив пуст");
         }
 
+        int length = table.length;
         if (a.length < length) {
             a = Arrays.copyOf(a, length);
         }
@@ -131,33 +135,56 @@ public class MyHashTable<T> implements Collection<T> {
 
     @Override
     public boolean add(T t) {
-        int index = Math.abs(t.hashCode() % length);
+        int tHash = 0;
+
+        if (t != null) {
+            tHash = t.hashCode();
+        }
+
+        int index = Math.abs(tHash % table.length);
 
         if (table[index] == null) {
             table[index] = new ArrayList<>();
-            table[index].add(t);
-            return true;
         }
 
-        if (!table[index].contains(t)) {
-            table[index].add(t);
-            return true;
-        }
-        return false;
+        table[index].add(t);
+        size++;
+        modificationCount++;
+
+        return true;
     }
 
 
     @Override
     public boolean remove(Object o) {
-        int index = Math.abs(o.hashCode() % length);
+        int oHash = 0;
 
-        return table[index] != null && table[index].remove(o);
+        if (o != null) {
+            oHash = o.hashCode();
+        }
+
+        int index = Math.abs(oHash % table.length);
+        boolean removed = false;
+
+        if (table[index] != null && table[index].remove(o)) {
+            size--;
+            modificationCount++;
+            removed = true;
+        }
+
+        return removed;
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
         for (Object cElement : c) {
-            int index = Math.abs(cElement.hashCode() % length);
+            int cElementHash = 0;
+
+            if (cElement != null) {
+                cElementHash = cElement.hashCode();
+            }
+
+            int index = Math.abs(cElementHash % table.length);
 
             //noinspection SuspiciousMethodCalls
             if (table[index] == null || !table[index].contains(cElement)) {
@@ -169,13 +196,15 @@ public class MyHashTable<T> implements Collection<T> {
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
-        Iterator iterator = c.iterator();
-
         boolean changed = false;
-        while (iterator.hasNext()) {
-            //noinspection unchecked
-            changed = add((T) iterator.next());
+
+        for (T element : c) {
+            if (add(element)) {
+                modificationCount++;
+                changed = true;
+            }
         }
+
         return changed;
     }
 
@@ -184,10 +213,18 @@ public class MyHashTable<T> implements Collection<T> {
         boolean removed = false;
 
         for (Object e : c) {
-            int index = Math.abs(e.hashCode() % length);
+            int eHash = 0;
+
+            if (e != null) {
+                eHash = e.hashCode();
+            }
+
+            int index = Math.abs(eHash % table.length);
 
             //noinspection SuspiciousMethodCalls
-            if (table[index].remove(e)) {
+            while (table[index].remove(e)) {
+                size--;
+                modificationCount++;
                 removed = true;
             }
         }
@@ -198,9 +235,15 @@ public class MyHashTable<T> implements Collection<T> {
     public boolean retainAll(Collection<?> c) {
         boolean removed = false;
 
-        for (int i = 0; i < length; i++) {
-            if (table[i] != null && table[i].retainAll(c)) {
-                removed = true;
+        for (ArrayList<T> list : table) {
+            if (list != null) {
+                int oldSize = list.size();
+
+                if (list.retainAll(c)) {
+                    size -= oldSize - list.size();
+                    modificationCount++;
+                    removed = true;
+                }
             }
         }
         return removed;
@@ -208,8 +251,11 @@ public class MyHashTable<T> implements Collection<T> {
 
     @Override
     public void clear() {
-        for (int i = 0; i < length; i++) {
-            table[i] = null;
+        for (ArrayList<T> list : table) {
+            if (list != null) {
+                list.clear();
+                modificationCount++;
+            }
         }
     }
 }
