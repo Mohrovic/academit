@@ -112,7 +112,7 @@ public class Main {
                         }
                         View.printField(gameField, mask);
 
-                        System.out.println("game over!"); //TODO правильное открытие, если флажки стоят
+                        System.out.println("game over!");
                         break;
                     }
 
@@ -138,10 +138,6 @@ public class Main {
                                             (currentY < 0 || currentY >= dimension)) {
                                         continue;
                                     }
-
-                                    //if (dx == dy) { //todo если соседи-цифры, то открыть в углу
-                                    //     continue;
-                                    // }
 
                                     if (gameField[currentX][currentY] != '*') {
                                         if (gameField[currentX][currentY] == '0' && mask[currentX][currentY] == 0) {
