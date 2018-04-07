@@ -1,51 +1,38 @@
 package minesweeper;
 
+import minesweeper.field.Field;
+
 public class Model extends java.util.Observable {
 
     private Field field;
     private int flags;
 
     private long startTime;
-    private boolean isRunning;
-    private boolean isGameOver;
+    private int level;
+    private int dimension;
+    private int minesTotal;
 
-    public void openCell(int x, int y) throws IllegalArgumentException {
-
-        if (field.openCell(x, y)) {
-            field.setNotification(null); // для консольной версии
-
-            field.setDisplayMode(1); // для консольной версии
-
-            setChanged();
-            notifyObservers(field);
-
-        } else {
-            String notification = "Game over!";
-            field.setNotification(notification);
-
-            field.setDisplayMode(1);
-
-            setChanged();
-            notifyObservers(field);
-
-            isGameOver = true;
-        }
+    public Model() {
+        level = 1;
+        dimension = 9;
+        minesTotal = 10;
     }
 
-    public void setFlag(int userXCoordinate, int userYCoordinate) throws IllegalArgumentException {
-        char[][] gameField = field.getGameField();
-        byte[][] mask = field.getMask();
+    public boolean openCell(int x, int y) throws IllegalArgumentException {
+        return field.openCell(x, y);
+    }
 
-        switch (mask[userXCoordinate][userYCoordinate]) {
-            case 0: {
+    public boolean setFlag(int userXCoordinate, int userYCoordinate) throws IllegalArgumentException {
+        boolean isFlagsOverlapsMines = false;
+
+        switch (field.getMask(userXCoordinate, userYCoordinate)) {
+            case CLOSED:
                 if (flags > 0) {
-                    mask[userXCoordinate][userYCoordinate] = 2;
+                    field.setMask(userXCoordinate, userYCoordinate, Field.mask.FLAG);
 
                     flags--;
 
                     field.setFlagsLeft(flags);
-
-                    field.setDisplayMode(1);
 
                     setChanged();
                     notifyObservers(field);
@@ -55,114 +42,120 @@ public class Model extends java.util.Observable {
                 int dimension = field.getDimension();
 
                 if (flags == 0) {
-                    boolean isFlagsOverlapsMines = false;
                     for (int x = 0; x < dimension; x++) {
                         for (int y = 0; y < dimension; y++) {
-                            if (mask[x][y] == 2) {
-                                isFlagsOverlapsMines = (gameField[x][y] == '*');
+                            if (field.getMask(x, y) == Field.mask.FLAG) {
+                                isFlagsOverlapsMines = (field.getCellObject(x, y) == Field.cellObject.MINE);
                             }
                         }
                     }
-
-                    if (isFlagsOverlapsMines) {
-                        long finishTime = System.currentTimeMillis();
-                        long timeConsumedMillis = finishTime - startTime;
-
-                        String notification = "Победа!";
-                        field.setNotification(notification);
-
-                        field.setDisplayMode(2);
-
-                        setChanged();
-                        notifyObservers(field);
-
-                        isRunning = false;
-
-                        Records.printAndSaveRecords(timeConsumedMillis);
-                    } else {
-                        String notification = "Флажки закончились";
-                        field.setNotification(notification);
-
-                        field.setDisplayMode(2);
-
-                        setChanged();
-                        notifyObservers(field);
-                    }
                 }
-            }
-            break;
+                break;
 
-            case 1: {
-                String notification = "Эта ячейка уже открыта";
-                field.setNotification(notification);
-
-                field.setDisplayMode(1);
-
+            case OPENED:
                 setChanged();
                 notifyObservers(field);
-            }
-            break;
+                break;
 
-            case 2: {
-                mask[userXCoordinate][userYCoordinate] = 3;
+            case FLAG:
+                field.setMask(userXCoordinate, userYCoordinate, Field.mask.QUESTION_MARK);
 
                 flags++;
 
-                field.setDisplayMode(1);
+                setChanged();
+                notifyObservers(field);
+                break;
+
+            case QUESTION_MARK:
+                field.setMask(userXCoordinate, userYCoordinate, Field.mask.CLOSED);
 
                 setChanged();
                 notifyObservers(field);
-            }
-            break;
-
-            case 3: {
-                mask[userXCoordinate][userYCoordinate] = 0;
-
-                field.setDisplayMode(1);
-
-                setChanged();
-                notifyObservers(field);
-            }
-            break;
+                break;
         }
+        return isFlagsOverlapsMines; //true - победа, все флаги стоят над всеми минами
     }
 
-    public void newGame(int dimension, int minesTotal) {
-        isRunning = true;
-        isGameOver = false;
+    public boolean openAdjacent(int userXCoordinate, int userYCoordinate) throws IllegalArgumentException {
+        return field.openAdjacent(userXCoordinate, userYCoordinate);
+    }
+
+
+    public Field startNewGame(int level) {
+        switch (level) {
+            case 1:
+                dimension = 9;
+                minesTotal = 10;
+                break;
+
+            case 2:
+                dimension = 16;
+                minesTotal = 40;
+                break;
+
+            case 3:
+                dimension = 22;
+                minesTotal = 99;
+                break;
+
+            case 4:
+                //размеры и количество мин заданы через сеттеры
+
+                if (dimension < 9 || dimension > 30) {
+                    dimension = 9;
+                }
+
+                int minesMax = (dimension - 1) * (dimension - 1);
+                if (minesTotal < 10 || minesTotal > minesMax) {
+                    minesTotal = 10;
+                }
+                break;
+
+            default:
+                dimension = 9;
+                minesTotal = 10;
+        }
 
         field = new Field(dimension, minesTotal);
         flags = minesTotal;
 
+        this.level = level;
+
         startTime = System.currentTimeMillis();
 
-        String notification = "Новая игра:";
-        field.setNotification(notification);
-
-        field.setDisplayMode(1);
-
-        setChanged();
-        notifyObservers(field);
+        return field;
     }
 
-    public void exitGame() {
-        isRunning = false;
+
+    public Field getField() {
+        return field;
     }
 
-    public boolean isRunning() {
-        return isRunning;
+    public long getTimeConsumedMills() {
+        long finishTime = System.currentTimeMillis();
+        return finishTime - startTime;
     }
 
-    public boolean isGameOver() {
-        return isGameOver;
+    public int getLevel() {
+        return level;
     }
 
-    public void showMessage(String message) {
-        field.setNotification(message);
 
-        field.setDisplayMode(2);
+    public void setDimension(int dimension) {
+        if (dimension >= 1 && dimension <= 30) {
+            this.dimension = dimension;
+        } else {
+            throw new IllegalArgumentException("Размер поля должен быть в пределах от 1 до 30 (передано" + dimension + ")");
+        }
+    }
 
-        setChanged();
-        notifyObservers(field);
+    public void setMinesTotal(int minesTotal) {
+        int minesMax = (dimension - 1) * (dimension - 1);
+        if (minesTotal >= 10 && minesTotal <= minesMax) {
+            this.minesTotal = minesTotal;
+        } else {
+            throw new IllegalArgumentException("Количество мин должно быть в пределах от 10 до "
+                    + minesMax + " (передано" + minesTotal + ")");
+        }
     }
 }

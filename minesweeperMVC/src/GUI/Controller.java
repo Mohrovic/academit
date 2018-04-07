@@ -1,158 +1,65 @@
 package GUI;
 
 import minesweeper.Model;
+import minesweeper.Records;
+import minesweeper.ViewListener;
 
-import java.util.InputMismatchException;
-import java.util.Scanner;
 
-public class Controller {
+public class Controller implements ViewListener {
+    private Model model;
+    private ConsoleView consoleView;
 
-    Model model;
-    View view;
-
-    public void addModel(Model model) {
+    public Controller(Model model, ConsoleView consoleView) {
         this.model = model;
+        this.consoleView = consoleView;
+
+        consoleView.updateField(model.startNewGame(model.getLevel()));
     }
 
-    public void addView(View view) {
-        this.view = view;
-    }
-
-    public void initModel(int dimension, int minesTotal) {
-        model.newGame(dimension, minesTotal);
-    }
-
-    public void waitCommand() throws IllegalArgumentException {
-        Scanner scanner = new Scanner(System.in);
-        int command;
-
-        try {
-            command = scanner.nextInt();
-        } catch (InputMismatchException e) {
-            command = -1;
-        }
-
-        switch (command) {
-            case 1: {
-                model.showMessage("Введите координату по горизонтали:");
-                int userYCoordinate;
-                try {
-                    userYCoordinate = scanner.nextInt();
-                } catch (InputMismatchException e) {
-                    userYCoordinate = -1;
-                }
-                userYCoordinate--;
-
-                model.showMessage("Введите координату по вертикали:");
-                int userXCoordinate;
-                try {
-                    userXCoordinate = scanner.nextInt();
-                } catch (InputMismatchException e) {
-                    userXCoordinate = -1;
-                }
-                userXCoordinate--;
-
-                model.openCell(userXCoordinate, userYCoordinate);
-            }
-            break;
-
-            case 2: {
-                model.showMessage("Введите координату по горизонтали:");
-                int userYCoordinate;
-                try {
-                    userYCoordinate = scanner.nextInt();
-                } catch (InputMismatchException e) {
-                    userYCoordinate = -1;
-                }
-                userYCoordinate--;
-
-                model.showMessage("Введите координату по вертикали:");
-                int userXCoordinate;
-                try {
-                    userXCoordinate = scanner.nextInt();
-                } catch (InputMismatchException e) {
-                    userXCoordinate = -1;
-                }
-                userXCoordinate--;
-
-                model.setFlag(userXCoordinate, userYCoordinate);
-            }
-
-            break;
-
-            case 3: {
-                model.showMessage("Выберите уровень (1-новичок, 2-любитель, 3-профессионал, 4-особый):");
-                newFieldSelect();
-            }
-            break;
-
-            case 4: {
-                model.exitGame();
-            }
-            break;
-
-            default: {
-                model.showMessage("Неизвестная команда. Введите команду:");
-            }
+    @Override
+    public void needOpenCell(int x, int y) {
+        boolean isGameOver = !model.openCell(x, y);
+        consoleView.updateField(model.getField());
+        if (isGameOver) {
+            model.startNewGame(model.getLevel());
         }
     }
 
-    public void newFieldSelect() {
-        Scanner scanner = new Scanner(System.in);
-        int command;
-        try {
-            command = scanner.nextInt();
-        } catch (InputMismatchException e) {
-            command = -1;
+    @Override
+    public void needSetFlag(int x, int y) {
+        //проверка на выигрыш
+        if (!model.setFlag(x, y)) {
+            consoleView.updateField(model.getField());
+        } else {
+            Records record = new Records();
+            if(record.updateRecord(model.getTimeConsumedMills(), model.getLevel())) {
+                consoleView.showRecords(record);
+            }
+
+            consoleView.updateField(model.startNewGame(model.getLevel()));
         }
+    }
 
-        int dimension = -1;
-        int minesTotal = -1;
-
-        switch (command) {
-            case 1: {
-                dimension = 9;
-                minesTotal = 10;
-            }
-            break;
-            case 2: {
-                dimension = 16;
-                minesTotal = 40;
-            }
-            break;
-            case 3: {
-                dimension = 22;
-                minesTotal = 99;
-            }
-            break;
-            case 4: {
-                while (dimension < 9 || dimension > 30) {
-                    model.showMessage("Введите размеры поля (от 9 до 30):");
-                    try {
-                        dimension = scanner.nextInt();
-                    } catch (InputMismatchException e) {
-                        scanner.next();
-                    }
-                }
-
-                int minesMax = (dimension - 1) * (dimension - 1);
-                while (minesTotal < 10 || minesTotal > minesMax) {
-                    String message = "Введите количество мин (от 10 до " + minesMax + "):";
-                    model.showMessage(message);
-                    try {
-                        minesTotal = scanner.nextInt();
-                    } catch (InputMismatchException e) {
-                        scanner.next();
-                    }
-                }
-
-            }
-            break;
-            default: {
-                dimension = 9;
-                minesTotal = 10;
-            }
+    @Override
+    public void needOpenAdjacent(int x, int y) {
+        boolean isGameOver = !model.openAdjacent(x, y);
+        consoleView.updateField(model.getField());
+        if (isGameOver) {
+            model.startNewGame(model.getLevel());
         }
-        model.newGame(dimension, minesTotal);
+    }
+
+    @Override
+    public void needStartNewLevel(int level) {
+        consoleView.updateField(model.startNewGame(level));
+    }
+
+    @Override
+    public void needStartNewLevel(int dimension, int minesTotal) {
+        model.setDimension(dimension);
+        model.setMinesTotal(minesTotal);
+
+        final int SPECIAL_LEVEL = 4;
+        consoleView.updateField(model.startNewGame(SPECIAL_LEVEL));
     }
 }

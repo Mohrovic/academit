@@ -1,38 +1,22 @@
 package minesweeper;
 
+import GUI.ConsoleView;
 import GUI.Controller;
-import GUI.View;
 
 public class RunConsole {
 
     public RunConsole() {
 
-        Model myModel = new Model();
-        View myView = new View();
+        try (ConsoleView consoleView = new ConsoleView()) {
+            Model model = new Model();
 
-        myModel.addObserver(myView);
+            Controller controller = new Controller(model, consoleView);
 
-        Controller myController = new Controller();
-        myController.addModel(myModel);
-        myController.addView(myView);
+            consoleView.addViewListener(controller);
 
-        int dimension = 9;
-        int minesTotal = 10;
-        myController.initModel(dimension, minesTotal);
-
-        myView.addController(myController);
-
-        while (myModel.isRunning()) {
-            if (myModel.isGameOver()) {
-                myController.initModel(dimension, minesTotal);
-                continue;
-            }
-
-            try {
-                myController.waitCommand();
-            } catch (IllegalArgumentException e) {
-                myModel.showMessage("Неверные координаты: " + e);
-            }
+            consoleView.startApplication();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
